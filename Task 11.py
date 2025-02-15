@@ -21,22 +21,22 @@ def print_accounts(accounts):
 
 
 def transfer_money(accounts, account_from, account_to, value):
-    """Виконати переказ 'value' грошей з рахунку 'account_from' на 'account_to'.
-
-    При переказі коштів необхідно враховувати:
-        - чи вистачає грошей на рахунку, з якого здійснюється переказ;
-        - переказ складається зі зменшення балансу першого рахунку та збільшення
-          балансу другого; якщо хоча б на одному етапі відбувається помилка,
-          облікові записи повинні бути приведені в початковий стан
-          (механізм транзакції)
-          см. https://uk.wikipedia.org/wiki/Транзакція_(бази_даних)
-
-    Винятки (raise):
-        - NoMoneyToWithdrawError: на рахунку 'account_from'
-                                  не вистачає грошей для переказу;
-        - PaymentError: помилка під час переказу.
-    """
-    # Видаліть коментар та допишіть код
+    if account_from not in accounts or account_to not in accounts:
+        raise PaymentError("Один з акаунтів не знайдено")
+    
+    if accounts[account_from] < value:
+        raise NoMoneyToWithdrawError("Недостатньо коштів на рахунку")
+    
+    initial_from = accounts[account_from]
+    initial_to = accounts[account_to]
+    
+    try:
+        accounts[account_from] -= value
+        accounts[account_to] += value
+    except Exception as e:
+        accounts[account_from] = initial_from
+        accounts[account_to] = initial_to
+        raise PaymentError(f"Помилка при переказі: {str(e)}")
 
 
 if __name__ == "__main__":
